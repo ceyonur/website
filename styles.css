@@ -463,3 +463,93 @@ html { scroll-padding-bottom: 160px; }
 .directory-entry { scroll-margin-top: 24px; }
 .directory-page .prompt { font-size: 13px; }
 .directory-entry .prompt-command { display: inline-block; }
+
+
+
+/* Larger directory tabs and a compact, naturally scrolling home screen. */
+.session-tabs a {
+  font-size: 16px;
+  font-weight: 700;
+  min-height: 46px;
+}
+body[data-shell-directory="/"] .terminal-body { min-height: 0; }
+
+@media (min-width: 1000px) {
+  body[data-shell-directory="/"] { padding-top: 12px; }
+  body[data-shell-directory="/"].has-command-reader { padding-bottom: 80px; }
+  body[data-shell-directory="/"].terminal-output-open {
+    padding-bottom: calc(80px + min(40vh, 360px));
+  }
+  body[data-shell-directory="/"] .terminal-body { padding: 12px 32px 8px; }
+  #home .identity-output { padding-top: 10px; padding-bottom: 0; }
+  #home .bio-output { margin-top: 12px; line-height: 1.7; }
+  #home .bio-output p + p { margin-top: 8px; }
+  #home .career-list { margin-top: 12px; line-height: 1.5; }
+  #home .career-list > div { margin: 0 0 10px; padding-left: 12px; }
+  #home .career-list > div:last-child { margin-bottom: 0; }
+  #home .career-list dd { margin-top: 0; }
+  #home .career-list .comment { margin-top: 3px; line-height: 1.5; }
+  #home .career-list .placeholder-link { font-size: inherit; }
+  #home .career-dates { margin-left: 6px; font-size: 12px; white-space: nowrap; }
+  body[data-shell-directory="/"] .typed-console { padding: 8px 24px; }
+  body[data-shell-directory="/"] .terminal-dock-toolbar { padding: 2px 10px; margin-bottom: 2px; }
+  body[data-shell-directory="/"] .typed-form { padding-top: 0; padding-bottom: 0; }
+}
+@media (max-width: 700px) {
+  .session-tabs a { font-size: 14px; min-height: 44px; padding: 8px 6px; }
+  .session-tabs { padding-left: 4px; padding-right: 4px; }
+  .session-tabs .tab-index { font-size: 11px; }
+  .session-tabs a { gap: 1px; }
+  .identity-subtitle, .career-list dd { overflow-wrap: anywhere; }
+  .typed-console { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+}
+@media (max-width: 360px) {
+  .session-tabs a { padding-left: 4px; padding-right: 4px; gap: 0; }
+  .session-tabs .tab-index { display: none; }
+}
+
+@media (min-width: 1000px) and (max-height: 760px) {
+  body[data-shell-directory="/"] { padding-top: 8px; }
+  body[data-shell-directory="/"] .terminal-body { padding-top: 8px; padding-bottom: 6px; }
+  #home .identity-output { padding-top: 6px; }
+  #home .career-list { margin-top: 8px; line-height: 1.4; }
+  #home .career-list > div { margin-bottom: 6px; }
+}
+
+/* Keep the terminal frame aligned as pages gain or lose a scrollbar. */
+html { scrollbar-gutter: stable; }
+@media (min-width: 1000px) {
+  body { padding-top: 12px; }
+  .terminal-body { padding: 12px 32px 8px; }
+  .typed-console { padding: 8px 24px; }
+  .terminal-dock-toolbar { padding: 2px 10px; margin-bottom: 2px; }
+  .typed-form { padding-top: 0; padding-bottom: 0; }
+}
+@media (min-width: 1000px) and (max-height: 760px) {
+  body { padding-top: 8px; }
+  .terminal-body { padding-top: 8px; padding-bottom: 6px; }
+}
+
+/* Make work titles easy to distinguish from their descriptions. */
+#home .career-list dd:not(.comment) { color: var(--text); font-weight: 600; }
+#home .career-list .career-dates { color: var(--muted); font-weight: 400; }
+#home .career-list dd.comment { color: var(--muted); font-weight: 400; }
+#home .career-list dd.comment .placeholder-link { color: inherit; }
+
+/* Match the reading size used in the other sections. */
+#home .career-list, #home .career-list dd.comment, #home .identity-subtitle { font-size: 14px; }
+#home .career-list .career-dates { font-size: 13px; }
+
+/* Keep command prompts consistent across all directories. */
+.prompt, .directory-page .prompt, .typed-prompt { font-size: 14px; }
+
+/* Reserve the command's final size while its letters are typed. */
+.opening-command { position: relative; display: inline-block; max-width: 100%; }
+.opening-command-reserve { opacity: 0; }
+.opening-command-typing { position: absolute; inset: 0; }
+.opening-command-typing::after { content: ''; display: inline-block; width: .55em; height: 1em; background: var(--accent); vertical-align: -.1em; }
+
+#home .career-list dt { font-size: 16px; }
+
+/* Keep a consistent gap between the last content and the frame. */
+body[data-shell-directory] .terminal-body { padding-bottom: 32px; }

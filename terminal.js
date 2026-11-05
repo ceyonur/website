@@ -281,6 +281,49 @@
   document.querySelector('.help-jump').addEventListener('click', event => {
     event.preventDefault(); run('help'); focusPrompt();
   });
+  // Fold navigation into the existing opening command.
+  let previousDirectory = null;
+  if (document.referrer) {
+    const referrer = new URL(document.referrer);
+    if (referrer.origin === location.origin) {
+      previousDirectory = Object.keys(directories).find(path => {
+        const page = new URL(directories[path].page, siteRoot);
+        return referrer.pathname === page.pathname ||
+          (page.pathname.endsWith('/index.html') && referrer.pathname === new URL('./', page).pathname);
+      }) ?? null;
+    }
+  }
+  const changeCommand = `cd ${displayPath(pageDirectory)}`;
+  if (changeCommand) {
+    const prompt = document.querySelector('#main .prompt');
+    const command = prompt?.querySelector('.prompt-command');
+    const path = prompt?.querySelector('.prompt-path');
+    if (command && path) {
+      command.textContent = `${changeCommand} && ${command.textContent}`;
+      path.textContent = displayPath(previousDirectory ?? '/');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const text = command.textContent;
+        const reserve = document.createElement('span');
+        reserve.className = 'opening-command-reserve';
+        reserve.textContent = text;
+        const typed = document.createElement('span');
+        typed.className = 'opening-command-typing';
+        typed.setAttribute('aria-hidden', 'true');
+        command.classList.add('opening-command');
+        command.replaceChildren(reserve, typed);
+        let position = 0;
+        function typeNext() {
+          typed.textContent = text.slice(0, ++position);
+          if (position < text.length) setTimeout(typeNext, 35);
+          else {
+            command.textContent = text;
+            command.classList.remove('opening-command');
+          }
+        }
+        setTimeout(typeNext, 120);
+      }
+    }
+  }
   refreshContext();
   consoleElement.hidden = false;
   document.body.classList.add('has-command-reader');
@@ -288,5 +331,8 @@
   const pending = parameters.get('run');
   if (pending && /^cat\s+/.test(pending) && Object.hasOwn(files, resolvePath(pending.slice(4).trim())) && samePage(files[resolvePath(pending.slice(4).trim())])) run(pending);
   else visitEntry(location.hash);
+  if (changeCommand && (!location.hash || location.hash === directories[pageDirectory].hash)) {
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  }
   if (parameters.has('shell')) focusPrompt();
 })();
