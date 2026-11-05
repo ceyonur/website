@@ -281,47 +281,35 @@
   document.querySelector('.help-jump').addEventListener('click', event => {
     event.preventDefault(); run('help'); focusPrompt();
   });
-  // Fold navigation into the existing opening command.
-  let previousDirectory = null;
-  if (document.referrer) {
-    const referrer = new URL(document.referrer);
-    if (referrer.origin === location.origin) {
-      previousDirectory = Object.keys(directories).find(path => {
-        const page = new URL(directories[path].page, siteRoot);
-        return referrer.pathname === page.pathname ||
-          (page.pathname.endsWith('/index.html') && referrer.pathname === new URL('./', page).pathname);
-      }) ?? null;
-    }
-  }
+  // Render a deterministic opening command with one visible text node.
   const changeCommand = `cd ${displayPath(pageDirectory)}`;
-  if (changeCommand) {
-    const prompt = document.querySelector('#main .prompt');
-    const command = prompt?.querySelector('.prompt-command');
-    const path = prompt?.querySelector('.prompt-path');
-    if (command && path) {
-      command.textContent = `${changeCommand} && ${command.textContent}`;
-      path.textContent = displayPath(previousDirectory ?? '/');
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const text = command.textContent;
-        const reserve = document.createElement('span');
-        reserve.className = 'opening-command-reserve';
-        reserve.textContent = text;
-        const typed = document.createElement('span');
-        typed.className = 'opening-command-typing';
-        typed.setAttribute('aria-hidden', 'true');
-        command.classList.add('opening-command');
-        command.replaceChildren(reserve, typed);
-        let position = 0;
-        function typeNext() {
-          typed.textContent = text.slice(0, ++position);
-          if (position < text.length) setTimeout(typeNext, 35);
-          else {
-            command.textContent = text;
-            command.classList.remove('opening-command');
-          }
+  const openingPrompt = document.querySelector('#main .prompt');
+  const openingCommand = openingPrompt?.querySelector('.prompt-command');
+  const openingPath = openingPrompt?.querySelector('.prompt-path');
+  if (openingCommand && openingPath) {
+    const text = `${changeCommand} && ${pageDirectory === '/' ? 'whoami' : 'ls -la'}`;
+    openingPath.textContent = '~';
+    openingCommand.textContent = text;
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const bounds = openingCommand.getBoundingClientRect();
+      const originalStyle = openingCommand.getAttribute('style');
+      openingCommand.style.display = 'inline-block';
+      openingCommand.style.width = `${bounds.width}px`;
+      openingCommand.style.maxWidth = '100%';
+      openingCommand.style.minHeight = `${bounds.height}px`;
+      openingCommand.classList.add('opening-command');
+      openingCommand.textContent = '';
+      let position = 0;
+      function typeNext() {
+        openingCommand.textContent = text.slice(0, ++position);
+        if (position < text.length) setTimeout(typeNext, 35);
+        else {
+          openingCommand.classList.remove('opening-command');
+          if (originalStyle === null) openingCommand.removeAttribute('style');
+          else openingCommand.setAttribute('style', originalStyle);
         }
-        setTimeout(typeNext, 120);
       }
+      setTimeout(typeNext, 120);
     }
   }
   refreshContext();

@@ -543,11 +543,8 @@ html { scrollbar-gutter: stable; }
 /* Keep command prompts consistent across all directories. */
 .prompt, .directory-page .prompt, .typed-prompt { font-size: 14px; }
 
-/* Reserve the command's final size while its letters are typed. */
-.opening-command { position: relative; display: inline-block; max-width: 100%; }
-.opening-command-reserve { opacity: 0; }
-.opening-command-typing { position: absolute; inset: 0; }
-.opening-command-typing::after { content: ''; display: inline-block; width: .55em; height: 1em; background: var(--accent); vertical-align: -.1em; }
+/* The typing cursor decorates the single command text node. */
+.opening-command::after { content: ''; display: inline-block; width: .55em; height: 1em; background: var(--accent); vertical-align: -.1em; }
 
 #home .career-list dt { font-size: 16px; }
 
